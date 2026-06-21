@@ -30,10 +30,11 @@ response = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "Solve any hard reasoning problem",
+            "content": "What are some interesting facts about South Korea?",
         }
     ],
     extra_body={"reasoning": {"enabled": True}},
 )
 
-print(response)
+print(f"Response model name: {response.model}")
+print(response.choices[0].message.content)

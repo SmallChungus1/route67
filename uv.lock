@@ -884,7 +884,6 @@ wheels = [
 
 [[package]]
 name = "route67"
-version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "model2vec" },

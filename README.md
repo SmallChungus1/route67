@@ -169,3 +169,37 @@ so constructing a controller with an empty routing table does not download it.
 - Routing decisions can be written as JSON Lines for later threshold tuning.
   These logs contain a short preview of each user query and should be treated
   as potentially sensitive data.
+
+## Publishing to TestPyPI
+
+TestPyPI is a separate service from PyPI, so create and verify an account at
+<https://test.pypi.org/> and create an API token there.
+
+Update `__version__` in `src/llm_router/__init__.py` for each release, then run:
+
+```console
+uv sync --extra test
+uv run pytest
+uv build --clear
+uvx twine check dist/*
+uvx twine upload --repository testpypi dist/*
+```
+
+When prompted by Twine, use `__token__` as the username and paste the complete
+TestPyPI token, including its `pypi-` prefix, as the password. Do not store the
+token in the repository.
+
+After uploading, verify the published wheel in a fresh environment:
+
+```console
+python -m venv .venv-testpypi
+.\.venv-testpypi\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install model2vec numpy openai
+python -m pip install --index-url https://test.pypi.org/simple/ --no-deps route67
+python -c "import llm_router; print(llm_router.__version__)"
+```
+
+On macOS/Linux, activate that environment with
+`source .venv-testpypi/bin/activate`. Dependencies are installed from PyPI
+separately because TestPyPI does not mirror the complete PyPI dependency set.
