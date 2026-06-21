@@ -34,6 +34,7 @@ def run_with_escalation(
     prompt = build_escalation_prompt(
         config.weak_model.usage_notes,
         config.strong_model,
+        config.routing_table,
     )
     weak_messages = [{"role": "system", "content": prompt}, *messages]
     weak_stream = client.chat.completions.create(

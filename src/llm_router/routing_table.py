@@ -1,4 +1,4 @@
-"""In-memory semantic routing table with an optional disk cache."""
+"""In-memory semantic routing table with semantic search and an optional disk cache."""
 
 from __future__ import annotations
 

@@ -69,11 +69,21 @@ from llm_router import Controller, ModelSpec, RouterConfig, RoutingTableEntry
 
 config = RouterConfig(
     routing_table=[
-        RoutingTableEntry("Prove this theorem", "strong_model"),
+        RoutingTableEntry(
+            "Prove this theorem",
+            "strong_model",
+            notes="Requires a rigorous multi-step proof.",
+        ),
         RoutingTableEntry("Rewrite this paragraph", "weak_model"),
     ],
-    weak_model=ModelSpec("gpt-5-mini", "Avoid difficult multi-step proofs."),
-    strong_model=ModelSpec("gpt-5"),
+    weak_model=ModelSpec(
+        "gpt-5-mini",
+        usage_notes="Avoid difficult multi-step proofs.",
+    ),
+    strong_model=ModelSpec(
+        "gpt-5",
+        usage_notes="Use for rigorous proofs and difficult reasoning.",
+    ),
     embedding_cache_path=".cache/routes",
     log_path=".cache/routing.jsonl",
 )
@@ -120,16 +130,22 @@ config = RouterConfig(
     routing_table=[
         RoutingTableEntry(
             "Answer questions about a country",
-            "weak_model"
+            "weak_model",
         ),
-
         RoutingTableEntry(
             "Solve a difficult reasoning or math problem",
-            "strong_model"
-        )
+            "strong_model",
+            notes="Requires careful multi-step reasoning.",
+        ),
     ],
-    weak_model=ModelSpec("openai/gpt-4.1-mini"),
-    strong_model=ModelSpec("deepseek/deepseek-v4-flash"),
+    weak_model=ModelSpec(
+        "openai/gpt-4.1-mini",
+        usage_notes="Best for straightforward factual and writing questions.",
+    ),
+    strong_model=ModelSpec(
+        "deepseek/deepseek-v4-flash",
+        usage_notes="Use for difficult reasoning, mathematics, and verification.",
+    ),
 )
 
 client = Controller(config, openai_client=openrouter)
@@ -152,6 +168,11 @@ pass its assistant message fields back unmodified in the next request.
 Routing table entries target only `"weak_model"` or `"strong_model"`. Provider
 model names live in `ModelSpec`, so switching models or providers does not
 require rewriting the routing table.
+
+`ModelSpec.usage_notes` are added to the weak model's escalation system prompt.
+The prompt also includes up to five routing-table entries targeting
+`"strong_model"` as examples of requests that should be escalated. Add concise
+`notes` to those entries when the reason for escalation is useful context.
 
 Your first request will download the `minishlab/potion-base-8M` from HuggingFace. The model is lazy-loaded,
 so constructing a controller with an empty routing table does not download it.

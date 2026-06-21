@@ -13,16 +13,22 @@ config = RouterConfig(
     routing_table=[
         RoutingTableEntry(
             "Answer questions about a country",
-            "weak_model"
+            "weak_model",
         ),
-
         RoutingTableEntry(
             "Solve a difficult reasoning or math problem",
-            "strong_model"
-        )
+            "strong_model",
+            notes="Requires careful multi-step reasoning.",
+        ),
     ],
-    weak_model=ModelSpec("google/gemma-3-4b-it"),
-    strong_model=ModelSpec("deepseek/deepseek-v4-flash"),
+    weak_model=ModelSpec(
+        "google/gemma-3-4b-it",
+        usage_notes="Best for straightforward factual and writing questions.",
+    ),
+    strong_model=ModelSpec(
+        "deepseek/deepseek-v4-flash",
+        usage_notes="Use for difficult reasoning, mathematics, and verification.",
+    ),
 )
 
 client = Controller(config, openai_client=openrouter)

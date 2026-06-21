@@ -3,13 +3,20 @@ from __future__ import annotations
 import unittest
 from types import SimpleNamespace
 
-from llm_router.config import ModelSpec, RouterConfig
+from llm_router.config import ModelSpec, RouterConfig, RoutingTableEntry
 from llm_router.escalation import run_with_escalation
 from tests.helpers import FakeClient, FakeCompletions, FakeStream, chunk
 
 
 def config() -> RouterConfig:
     return RouterConfig(
+        routing_table=[
+            RoutingTableEntry(
+                "Prove a difficult theorem",
+                "strong_model",
+                "Requires rigorous multi-step reasoning.",
+            )
+        ],
         weak_model=ModelSpec("weak", "Weak at proofs."),
         strong_model=ModelSpec("strong", "Use for proofs."),
     )
@@ -31,6 +38,10 @@ class EscalationTests(unittest.TestCase):
         self.assertEqual(result.response.choices[0].message.content, "Hello world")
         self.assertEqual(len(completions.calls), 1)
         self.assertTrue(stream.closed)
+        system_prompt = completions.calls[0]["messages"][0]["content"]
+        self.assertIn("Your limits: Weak at proofs.", system_prompt)
+        self.assertIn("- Prove a difficult theorem", system_prompt)
+        self.assertIn("Requires rigorous multi-step reasoning.", system_prompt)
 
     def test_sentinel_closes_stream_and_calls_strong_model(self) -> None:
         stream = FakeStream([chunk("  esc"), chunk("ALATE"), chunk("discard me")])
