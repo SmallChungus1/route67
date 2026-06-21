@@ -59,3 +59,4 @@ secrets*.json
 .DS_Store
 Thumbs.db
 Desktop.ini
+publish_instruction.md
