@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "route67"
+version = "0.1.0"
+description = "A semantic LLM router for OpenAI-compatible chat completions."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "route67 contributors" }]
+dependencies = [
+  "model2vec>=0.6,<1",
+  "numpy>=1.24",
+  "openai>=1.0,<3",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["llm_router"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

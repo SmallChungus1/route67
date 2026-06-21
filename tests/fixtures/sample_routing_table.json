@@ -1,0 +1,12 @@
+[
+  {
+    "query": "Solve a difficult algebra problem",
+    "target": "strong_model",
+    "notes": "multi-step mathematics"
+  },
+  {
+    "query": "Rewrite this email politely",
+    "target": "weak_model",
+    "notes": "simple editing"
+  }
+]

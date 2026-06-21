@@ -1,0 +1,60 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+*.venv
+
+# Python bytecode and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.tmp-dist/
+
+# Test, coverage, lint, and type-check caches
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+.mypy_cache/
+.pyright/
+.ruff_cache/
+.tox/
+.nox/
+
+# Runtime caches and logs
+.cache/
+*.log
+*.jsonl
+
+# Local environment variables and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+
+# Local model and Hugging Face caches
+.huggingface/
+.hf_home/
+
+# Editors, OS files, and local agent metadata
+.idea/
+.vscode/
+.agents/
+.codex/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
