@@ -3,6 +3,19 @@
 `route67` is a LLM router for OpenAI-compatible chat
 completions format. It uses a user-defined routing table for user defined question-model routing via semantic similarity, as a fallback a weak model answer or explicitly escalate to a strong model.
 
+## How it works
+
+```mermaid
+flowchart LR
+    Q["User request"] --> R{"Semantic route match?"}
+    R -- Yes --> M["Configured weak or strong model"]
+    R -- No --> W["Weak model gate<br/>usage notes + strong-route examples"]
+    W -- Answers --> O["Response"]
+    W -- ESCALATE --> S["Strong model"]
+    M --> O
+    S --> O
+```
+
 ## Install
 
 route67 requires Python 3.10 or newer. Choose either the standard Python workflow
