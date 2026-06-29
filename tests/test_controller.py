@@ -10,7 +10,7 @@ import numpy as np
 
 from llm_router.config import ModelSpec, RouterConfig, RoutingTableEntry
 from llm_router.controller import Controller, extract_user_query
-from llm_router.escalation import EscalationResult
+from llm_router.routing import EscalationResult
 from tests.helpers import FakeClient, FakeCompletions, FakeStream
 
 
@@ -73,7 +73,7 @@ class ControllerTests(unittest.TestCase):
             completions.calls[0]["extra_headers"], {"X-Provider": "example"}
         )
 
-    @patch("llm_router.controller.run_with_escalation")
+    @patch("llm_router.routing.run_with_escalation")
     def test_below_threshold_uses_escalation_path(self, escalate) -> None:
         weak_response = SimpleNamespace(model="weak")
         escalate.return_value = EscalationResult("weak", weak_response, False)
@@ -99,7 +99,19 @@ class ControllerTests(unittest.TestCase):
         ]
         self.assertEqual(extract_user_query(messages), "last")
 
-    @patch("llm_router.controller.run_with_escalation")
+    def test_non_text_user_content_falls_back_to_stringified_payload(self) -> None:
+        messages = [
+            {
+                "role": "user",
+                "content": [{"type": "image_url", "image_url": {"url": "https://x"}}],
+            }
+        ]
+
+        actual = extract_user_query(messages)
+
+        self.assertIn("image_url", actual)
+
+    @patch("llm_router.routing.run_with_escalation")
     def test_decision_is_logged(self, escalate) -> None:
         escalate.return_value = EscalationResult(
             "strong", SimpleNamespace(model="strong"), True

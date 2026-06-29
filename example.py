@@ -1,4 +1,5 @@
-"""Route67 usage with open router example"""
+"""Minimal route67 example using the default OpenAI client."""
+
 import os
 
 from openai import OpenAI
@@ -16,13 +17,13 @@ config = RouterConfig(
             "weak_model",
         ),
         RoutingTableEntry(
-            "Solve a difficult reasoning or math problem",
+            "How to derive the Boolean Satisfiability",
             "strong_model",
             notes="Requires careful multi-step reasoning.",
         ),
     ],
     weak_model=ModelSpec(
-        "google/gemma-3-4b-it",
+        "liquid/lfm-2-24b-a2b",
         usage_notes="Best for straightforward factual and writing questions.",
     ),
     strong_model=ModelSpec(
@@ -36,7 +37,7 @@ response = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "What are some interesting facts about South Korea?",
+            "content": "How to solve the Boolean Satisfiability problem",
         }
     ],
     extra_body={"reasoning": {"enabled": True}},

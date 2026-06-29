@@ -1,7 +1,9 @@
 # route67
 
-`route67` is a LLM router for OpenAI-compatible chat
-completions format. It uses a user-defined routing table for user defined question-model routing via semantic similarity, as a fallback a weak model answer or explicitly escalate to a strong model.
+`route67` is a LLM router for OpenAI-compatible chat completions. It uses a
+user-defined routing table for semantic request-to-model routing, then falls
+back to a weak-model gate that either answers directly or explicitly escalates
+to a strong model.
 
 ## How it works
 
@@ -75,7 +77,7 @@ $env:OPENAI_API_KEY = "your-api-key"
 export OPENAI_API_KEY="your-api-key"
 ```
 
-Create `example.py`:
+The repository includes a minimal [example.py](example.py):
 
 ```python
 from llm_router import Controller, ModelSpec, RouterConfig, RoutingTableEntry
@@ -126,9 +128,12 @@ route67 can use any provider exposed through an OpenAI-compatible client. Create
 the provider's client normally and inject it into the controller. Model names in
 the routing configuration are passed to that provider unchanged.
 
-For example, with OpenRouter:
+If you want to use another OpenAI-compatible provider, swap in that provider's
+client. For example, with OpenRouter:
 
 ```python
+"""Minimal route67 example using the default OpenAI client."""
+
 import os
 
 from openai import OpenAI
@@ -146,13 +151,13 @@ config = RouterConfig(
             "weak_model",
         ),
         RoutingTableEntry(
-            "Solve a difficult reasoning or math problem",
+            "How to derive the Boolean Satisfiability",
             "strong_model",
             notes="Requires careful multi-step reasoning.",
         ),
     ],
     weak_model=ModelSpec(
-        "openai/gpt-4.1-mini",
+        "liquid/lfm-2-24b-a2b",
         usage_notes="Best for straightforward factual and writing questions.",
     ),
     strong_model=ModelSpec(
@@ -166,11 +171,14 @@ response = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "How many r's are in the word 'strawberry'?",
+            "content": "How to solve the Traveling salesman problem",
         }
     ],
     extra_body={"reasoning": {"enabled": True}},
 )
+
+print(f"Response model name: {response.model}")
+print(response.choices[0].message.content)
 ```
 
 Provider-specific request options such as `extra_body` and `extra_headers` are
@@ -187,5 +195,6 @@ The prompt also includes up to five routing-table entries targeting
 `"strong_model"` as examples of requests that should be escalated. Add concise
 `notes` to those entries when the reason for escalation is useful context.
 
-Your first request will download the `minishlab/potion-base-8M` from HuggingFace. The model is lazy-loaded,
-so constructing a controller with an empty routing table does not download it.
+Your first request will download the `minishlab/potion-base-8M` embedding model
+from HuggingFace. The model is lazy-loaded, so constructing a controller with
+an empty routing table does not download it.

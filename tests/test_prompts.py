@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 from llm_router.config import ModelSpec, RoutingTableEntry
-from llm_router.prompts import build_escalation_prompt
+from llm_router.routing import build_escalation_prompt
 
 
 class EscalationPromptTests(unittest.TestCase):

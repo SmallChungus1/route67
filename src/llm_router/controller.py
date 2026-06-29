@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from .config import RouterConfig
-from .embedder import Embedder
-from .escalation import run_with_escalation
-from .logging_utils import RoutingDecision, log_decision
-from .routing_table import RoutingTable
+from .routing import RoutingDecision, build_chat_request, execute_chat_request, extract_user_query
+from .semantic import Embedder, RoutingTable
 
 
 class Controller:
@@ -28,56 +29,15 @@ class Controller:
         self.chat = _ChatProxy(self)
 
     def chat_completions_create(self, **kwargs: Any) -> Any:
-        if kwargs.get("stream"):
-            raise NotImplementedError("Public streaming is not supported in route67 v1")
-        messages = kwargs.get("messages")
-        if not isinstance(messages, list):
-            raise TypeError("messages must be provided as a list")
-
-        query = extract_user_query(messages)
-        entry, score = self.table.best_match(query)
-        forwarded = {key: value for key, value in kwargs.items() if key != "model"}
-
-        if entry is not None and score >= self.config.similarity_threshold:
-            selected_model = self.config.resolve_target(entry.target)
-            response = self.client.chat.completions.create(
-                model=selected_model.name,
-                **forwarded,
-            )
-            decision = RoutingDecision("table_match", selected_model.name, score)
-        else:
-            result = run_with_escalation(
-                self.client,
-                self.config,
-                messages,
-                request_kwargs=forwarded,
-            )
-            response = result.response
-            decision = RoutingDecision(
-                "escalated" if result.escalated else "weak_model_direct",
-                result.used_model,
-                score,
-            )
-
-        log_decision(self.config.log_path, query, decision)
+        request = build_chat_request(kwargs)
+        response, decision = execute_chat_request(
+            self.client,
+            self.config,
+            self.table,
+            request,
+        )
+        log_decision(self.config.log_path, request.query, decision)
         return response
-
-
-def extract_user_query(messages: list[dict[str, Any]]) -> str:
-    for message in reversed(messages):
-        if message.get("role") != "user":
-            continue
-        content = message.get("content", "")
-        if isinstance(content, str):
-            return content
-        if isinstance(content, list):
-            return " ".join(
-                part.get("text", "")
-                for part in content
-                if isinstance(part, dict) and part.get("type") == "text"
-            )
-        return str(content)
-    raise ValueError("messages must contain at least one user message")
 
 
 def _default_openai_client() -> Any:
@@ -86,6 +46,23 @@ def _default_openai_client() -> Any:
     except ImportError as exc:
         raise ImportError("openai is required when openai_client is not supplied") from exc
     return OpenAI()
+
+
+def log_decision(log_path: str | None, query: str, decision: RoutingDecision) -> None:
+    if not log_path:
+        return
+
+    path = Path(log_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "query_preview": " ".join(query.split())[:100],
+        "method": decision.method,
+        "model_used": decision.model,
+        "similarity_score": round(decision.score, 6),
+    }
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 class _ChatProxy:

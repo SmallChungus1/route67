@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from llm_router.config import RoutingTableEntry
-from llm_router.routing_table import RoutingTable
+from llm_router.semantic import RoutingTable
 
 
 class FakeEmbedder:

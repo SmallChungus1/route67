@@ -4,7 +4,7 @@ import unittest
 from types import SimpleNamespace
 
 from llm_router.config import ModelSpec, RouterConfig, RoutingTableEntry
-from llm_router.escalation import run_with_escalation
+from llm_router.routing import run_with_escalation
 from tests.helpers import FakeClient, FakeCompletions, FakeStream, chunk
 
 
