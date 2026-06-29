@@ -1,0 +1,62 @@
+[
+  {
+    "query": "Answer a simple factual question or definition",
+    "target": "weak_model",
+    "notes": "single fact lookup, recall, or dictionary-style response"
+  },
+  {
+    "query": "Translate a short word or phrase into another language",
+    "target": "weak_model",
+    "notes": "simple translation without cultural nuance"
+  },
+  {
+    "query": "Fix grammar, capitalization, or basic wording",
+    "target": "weak_model",
+    "notes": "light editing or formatting"
+  },
+  {
+    "query": "Do a one-step arithmetic or unit conversion",
+    "target": "weak_model",
+    "notes": "single calculation or conversion"
+  },
+  {
+    "query": "Provide a short code syntax example or simple regex",
+    "target": "weak_model",
+    "notes": "single API, syntax recall, or one-line code"
+  },
+  {
+    "query": "Classify or label a simple piece of text",
+    "target": "weak_model",
+    "notes": "sentiment, spam, or lightweight categorization"
+  },
+  {
+    "query": "Prove a theorem or derive a mathematical result step by step",
+    "target": "strong_model",
+    "notes": "formal proof, derivation, or advanced multi-step math"
+  },
+  {
+    "query": "Design a distributed system or scalable backend architecture",
+    "target": "strong_model",
+    "notes": "system design, tradeoffs, reliability, and scaling"
+  },
+  {
+    "query": "Implement a non-trivial algorithm or data structure",
+    "target": "strong_model",
+    "notes": "graphs, parsing, concurrency, or complexity analysis"
+  },
+  {
+    "query": "Debug a complex software issue and explain the root cause",
+    "target": "strong_model",
+    "notes": "performance, races, SQL tuning, or deep debugging"
+  },
+  {
+    "query": "Analyze tradeoffs between technical or conceptual approaches",
+    "target": "strong_model",
+    "notes": "nuanced comparison, constraints, or multi-factor reasoning"
+  },
+  {
+    "query": "Write constrained long-form creative content",
+    "target": "strong_model",
+    "notes": "sonnets, stories with strict structure, or complex stylistic constraints"
+  }
+]

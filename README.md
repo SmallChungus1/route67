@@ -151,7 +151,7 @@ config = RouterConfig(
             "weak_model",
         ),
         RoutingTableEntry(
-            "How to derive the Boolean Satisfiability",
+            "How to derive the Boolean Satisfiability, a NP problem",
             "strong_model",
             notes="Requires careful multi-step reasoning.",
         ),
@@ -164,6 +164,7 @@ config = RouterConfig(
         "deepseek/deepseek-v4-flash",
         usage_notes="Use for difficult reasoning, mathematics, and verification.",
     ),
+    similarity_threshold=0.11 #obtained from running bechmark_router.py to find best threshold
 )
 
 client = Controller(config, openai_client=openrouter)
@@ -171,7 +172,7 @@ response = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "How to solve the Traveling salesman problem",
+            "content": "How to solve the NP problem of Traveling salesman",
         }
     ],
     extra_body={"reasoning": {"enabled": True}},
@@ -198,3 +199,33 @@ The prompt also includes up to five routing-table entries targeting
 Your first request will download the `minishlab/potion-base-8M` embedding model
 from HuggingFace. The model is lazy-loaded, so constructing a controller with
 an empty routing table does not download it.
+
+## Benchmarking
+
+The repository includes a synthetic routing benchmark in
+`router_eval_dataset.jsonl` and a separate seed routing table in
+`benchmarks/router_seed_table.json`. The seed routes are intentionally broader
+than the eval queries so the benchmark does not simply memorize the dataset.
+
+Run the benchmark after installing the package:
+
+```console
+python benchmarks/benchmark_router.py
+```
+
+To explore threshold tradeoffs:
+
+```console
+python benchmarks/benchmark_router.py --threshold-sweep
+```
+
+To search a lower threshold range and choose the best threshold by strong-route
+F1:
+
+```console
+python benchmarks/benchmark_router.py --threshold-sweep --threshold-sweep-start 0.05 --threshold-sweep-end 0.50 --threshold-sweep-step 0.01 --optimize-metric strong_f1
+```
+
+This benchmark is separate from the unit test suite. It is meant to evaluate
+semantic routing quality and threshold behavior, not to act as a deterministic
+correctness test for every change.

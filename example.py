@@ -17,7 +17,7 @@ config = RouterConfig(
             "weak_model",
         ),
         RoutingTableEntry(
-            "How to derive the Boolean Satisfiability",
+            "How to derive the Boolean Satisfiability, a NP problem",
             "strong_model",
             notes="Requires careful multi-step reasoning.",
         ),
@@ -30,6 +30,7 @@ config = RouterConfig(
         "deepseek/deepseek-v4-flash",
         usage_notes="Use for difficult reasoning, mathematics, and verification.",
     ),
+    similarity_threshold=0.11 #obtained from running bechmark_router.py to find best threshold
 )
 
 client = Controller(config, openai_client=openrouter)
@@ -37,7 +38,7 @@ response = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "How to solve the Boolean Satisfiability problem",
+            "content": "How to solve the NP problem of Traveling salesman",
         }
     ],
     extra_body={"reasoning": {"enabled": True}},
